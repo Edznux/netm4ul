@@ -14,14 +14,22 @@ type Dirb struct {
 	Urls []string
 }
 
-//func (d Dirb) String() string {
-//	return fmt.Sprintf(d.Host, d.Urls)
-//}
+//Function what Remove duplicate
+func unique(stringSlice []string) []string {
+    keys := make(map[string]bool)
+    list := []string{} 
+    for _, entry := range stringSlice {
+        if _, value := keys[entry]; !value {
+            keys[entry] = true
+            list = append(list, entry)
+        }
+    }    
+    return list
+}
 
 func main() {
-	fmt.Println("Test affichage")
 	//Conf
-	var hostname string = "example.com"
+	var hostname string = "https://example.com"
 	var wordlist string = "/usr/share/wordlists/dirb/others/best15.txt" //Test dico
 
 	//Command
@@ -51,7 +59,8 @@ func main() {
 		}
 	}
 
-	dirbStruct := Dirb{Host : hostname,Urls : wordList}
+    uniqueSlice := unique(wordList)
+	dirbStruct := Dirb{Host : hostname,Urls : uniqueSlice}
 	fmt.Println(dirbStruct)
 
 }
