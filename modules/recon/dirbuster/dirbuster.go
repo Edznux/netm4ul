@@ -9,38 +9,49 @@ import (
 	"regexp"
 )
 
+type Dirb struct {
+	Host string
+	Urls []string
+}
+
+//func (d Dirb) String() string {
+//	return fmt.Sprintf(d.Host, d.Urls)
+//}
+
 func main() {
 	fmt.Println("Test affichage")
-
 	//Conf
-	var hostname string = "http://example.com"
-	var wordlist string = "/usr/share/wordlists/dirb/others/best15.txt"
+	var hostname string = "example.com"
+	var wordlist string = "/usr/share/wordlists/dirb/others/best15.txt" //Test dico
 
-
+	//Command
 	cmd := exec.Command("dirb", hostname, wordlist, "-S") //Execution
 	var out bytes.Buffer //Data buffer
+	var stderr bytes.Buffer //Data buffer
 	cmd.Stdout = &out
+	cmd.Stderr = &stderr
 	err := cmd.Run() //Error
+
 	if err != nil {
+		log.Println(stderr.String())
 		log.Fatal(err)
 	}
 
-	var result string = out.String()
+	//result
+	result := out.String()
 
 	words := strings.Fields(result)
 	
-	re := regexp.MustCompile("http([a-z]+)*") //URL Regex
-
-	for i, word := range words {
+	re := regexp.MustCompile("https?://([a-z]+)*") //URL Regex
+	var wordList []string
+	for _, word := range words {
 		if re.FindString(word) != "" {
-			i++ //lol
+			wordList = append(wordList, word)
 			fmt.Println(word)
 		}
 	}
-}
 
-//type Dirb struct {
-//	Config  ConfigToml
-//	Result  []byte
-//	Nmaprun *mynmap.NmapRun
-//}
+	dirbStruct := Dirb{Host : hostname,Urls : wordList}
+	fmt.Println(dirbStruct)
+
+}
